@@ -17,4 +17,9 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    pass
+    dist_pickle = pickle.load( open( "wide_dist_pickle.p", "rb" ) )
+    mtx = dist_pickle["mtx"]
+    dist = dist_pickle["dist"]
+
+    video = Video(args.source, mtx, dist)
+    video.start()

@@ -1,12 +1,15 @@
 
-class LastNLine():
+class LastNLine:
     def __init__(self, lines_count):
         self.n = lines_count
         pass
-    def new_line_sanity_check():
+
+    def passed_sanity_check():
         pass
+
     def add_new_line():
         pass
+
     def get_new_line():
         '''
         If your sanity checks reveal that the lane lines you've detected are problematic for some reason, you can simply assume it was a bad or difficult frame of video, retain the previous positions from the frame prior and step to the next frame to search again. If you lose the lines for several frames in a row, you should probably go back to the blind search method using a histogram and sliding window, or other method, to re-establish your measurement.
