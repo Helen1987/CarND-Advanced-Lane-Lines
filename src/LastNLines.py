@@ -1,16 +1,25 @@
+import numpy as np
+
+import ConvolutionalSlider
+import Line
+
+
+
 
 class LastNLine:
     def __init__(self, lines_count):
         self.n = lines_count
+        self.slider = ConvolutionalSlider(50, 80, 100)
+
+    def passed_sanity_check(self):
         pass
 
-    def passed_sanity_check():
-        pass
+    def add_new_line(self, image):
+        self.slider.find_window_centroids(image, 50, 80)
 
-    def add_new_line():
-        pass
 
-    def get_new_line():
+
+    def get_new_line(self):
         '''
         If your sanity checks reveal that the lane lines you've detected are problematic for some reason, you can simply assume it was a bad or difficult frame of video, retain the previous positions from the frame prior and step to the next frame to search again. If you lose the lines for several frames in a row, you should probably go back to the blind search method using a histogram and sliding window, or other method, to re-establish your measurement.
         '''
