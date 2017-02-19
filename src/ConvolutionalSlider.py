@@ -1,7 +1,7 @@
 import numpy as np
 
-import LineFitter
-import Line
+from .LineFitter import LineFitter
+from .Line import Line
 
 
 class ConvolutionalSlider:
@@ -64,8 +64,8 @@ class ConvolutionalSlider:
             self.x_centroids.append(centroid)
             self.y_values.append(int(image_height-(level+0.5)*self.window_height))
 
-    def get_line(self):
+    def get_lines(self):
         left_fit, right_fit = self.fitter.fit_polynomial(self.x_centroids, self.y_values)
         left_line = Line(left_fit)
-        right_Line = Line(right_fit)
-        return
+        right_line = Line(right_fit)
+        return left_line, right_line

@@ -2,18 +2,18 @@ import numpy as np
 import os
 from moviepy.editor import VideoFileClip
 
-import Frame
-import LastNLines
+from .Frame import Frame
+from .LastNLines import LastNLines
 
 
 class Video:
-    def __init(self, path, output_folder,  mtx, dist):
+    def __init__(self, path, output_folder,  mtx, dist):
         # calibrate the camera
         self.mtx = mtx
         self.dist = dist
         self.path = path
         self.output_folder = os.path.join(os.getcwd(), output_folder)
-        self.last_n_lines = LastNLines()
+        self.last_n_lines = LastNLines(5)
         self.source_points = None
         self.destination_points = None
 
@@ -42,17 +42,12 @@ class Video:
         current_frame.preprocess_frame(self.source_points, self.destination_points)
         # do perspective transformation
 
-        new_line = current_frame.get_line()
-        if self.last_n_lines.passed_sanity_check(new_line):
-            self.last_n_lines.add_new_line(new_line)
-        else:
-            # start earch from scrach
-            pass
+        self.last_n_lines.add_new_line(current_frame.bird_view_img)
+        left, right = self.last_n_lines.get_best_fit_lines()
 
-        result_line = self.last_n_lines.get_new_line()
-        current_frame.draw_line_area(result_line)
+        return current_frame.draw_line_area(left, right)
 
-    def start(self):
+    def process(self):
         project_video = VideoFileClip(self.path)
         self._init_perspective_points(project_video.size)
 
