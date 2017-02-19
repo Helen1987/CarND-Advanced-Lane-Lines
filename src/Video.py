@@ -45,7 +45,7 @@ class Video:
         self.last_n_lines.add_new_line(current_frame.bird_view_img)
         left, right = self.last_n_lines.get_best_fit_lines()
 
-        return current_frame.draw_line_area(left, right)
+        return current_frame.draw_line_area(left, right, self.source_points, self.destination_points)
 
     def process(self):
         project_video = VideoFileClip(self.path)
