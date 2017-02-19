@@ -66,6 +66,6 @@ class ConvolutionalSlider:
 
     def get_lines(self):
         left_fit, right_fit = self.fitter.fit_polynomial(self.x_centroids, self.y_values)
-        left_line = Line(left_fit)
-        right_line = Line(right_fit)
+        left_line = Line(left_fit, np.array(self.x_centroids, dtype=np.int32)[:, 0], self.y_values)
+        right_line = Line(right_fit, np.array(self.x_centroids, dtype=np.int32)[:, 1], self.y_values)
         return left_line, right_line

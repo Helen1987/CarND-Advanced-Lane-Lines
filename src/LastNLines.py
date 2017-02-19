@@ -18,10 +18,10 @@ class LastNLines:
         left_line, right_line = self.slider.get_lines()
         self.left_lines.append(left_line)
         if len(self.left_lines) > self.n:
-            self.left_lines.pop()
+            self.left_lines.popleft()
         self.right_lines.append(right_line)
         if len(self.right_lines) > self.n:
-            self.right_lines.pop()
+            self.right_lines.popleft()
 
     def get_best_fit_lines(self):
         return self.left_lines[-1], self.right_lines[-1]

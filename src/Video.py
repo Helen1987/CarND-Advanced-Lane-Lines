@@ -17,10 +17,7 @@ class Video:
         self.source_points = None
         self.destination_points = None
 
-    def _init_perspective_points(self, size):
-        width = size[0]
-        height = size[1]
-
+    def _init_perspective_points(self, width, height):
         top_offset = 110
         bottom_offset = 10
         top_line_offset = 110
@@ -37,19 +34,21 @@ class Video:
             [width-offset, 0], [width-offset, height]])
 
     def handle_frame(self, image):
-        # get image frame
-        current_frame = Frame(image, self.mtx, self.dist)
-        current_frame.preprocess_frame(self.source_points, self.destination_points)
-        # do perspective transformation
+        try:
+            current_frame = Frame(image, self.mtx, self.dist)
+            bird_view_img = current_frame.preprocess_frame(self.source_points, self.destination_points)
 
-        self.last_n_lines.add_new_line(current_frame.bird_view_img)
-        left, right = self.last_n_lines.get_best_fit_lines()
+            self.last_n_lines.add_new_line(bird_view_img)
+            left, right = self.last_n_lines.get_best_fit_lines()
 
-        return current_frame.draw_line_area(left, right, self.source_points, self.destination_points)
+            result = current_frame.draw_line_area(left, right, self.source_points, self.destination_points)
+        except:
+             print('exeption')
+        return result
 
     def process(self):
         project_video = VideoFileClip(self.path)
-        self._init_perspective_points(project_video.size)
+        self._init_perspective_points(project_video.size[0], project_video.size[1])
 
         new_video = project_video.fl_image(self.handle_frame)
         output_file_name = os.path.join(self.output_folder, "result_" + self.path)
