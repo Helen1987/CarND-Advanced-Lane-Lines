@@ -2,10 +2,11 @@ import numpy as np
 
 
 class LineFitter:
-    def __init__(self, ym_per_pix, xm_per_pix):
+    def __init__(self, height, ym_per_pix, xm_per_pix):
         # Define conversions in x and y from pixels space to meters
         self.ym_per_pix = ym_per_pix # meters per pixel in y dimension
         self.xm_per_pix = xm_per_pix # meters per pixel in x dimension
+        self.image_height = height
 
     def calculate_curvature(self, unscaled_y_values, unscaled_left_fit, unscaled_right_fit):
         scaled_y = unscaled_y_values * self.ym_per_pix
@@ -20,9 +21,9 @@ class LineFitter:
 
         return left_curverad, right_curverad
 
-    def fit_line(self, x_left, y_left, image_height):
+    def fit_line(self, x_left, y_left):
         line_fit = np.polyfit(y_left, x_left, 2)
 
-        plot_y = np.linspace(0, image_height - 1, image_height)
+        plot_y = np.linspace(0, self.image_height - 1, self.image_height)
         plot_x = line_fit[0] * plot_y ** 2 + line_fit[1] * plot_y + line_fit[2]
         return line_fit, plot_x, plot_y

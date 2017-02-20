@@ -51,6 +51,7 @@ class Video:
     def process(self):
         project_video = VideoFileClip(self.path)
         self._init_perspective_points(project_video.size[0], project_video.size[1])
+        self.last_n_lines.init(project_video.size[1])
 
         new_video = project_video.fl_image(self.handle_frame)
         output_file_name = os.path.join(self.output_folder, "result_" + self.path)

@@ -12,26 +12,28 @@ class LastNLines:
         self.right_lines = deque([])
         self.left_lines = deque([])
         self.slider = ConvolutionalSlider(50, 80, 100)
-        self.fitter = LineFitter(30 / 720, 3.7 / 700)
+        self.fitter = None
+
+    def init(self, height):
+        self.fitter = LineFitter(height, 30 / 720, 3.7 / 700)
 
     def passed_sanity_check(self):
         pass
 
-    def get_best_line_fit(self, x, y, old_lines, image_height):
+    def get_best_line_fit(self, x, y, old_lines):
         all_x = x[:]
         all_y = y[:]
         for line in old_lines:
             all_x = np.append(all_x, line.all_x)
             all_y = np.append(all_y, line.all_y)
-        return self.fitter.fit_line(all_x, all_y, image_height)
+        return self.fitter.fit_line(all_x, all_y)
 
-    def create_line(self, line_data, image_height, old_lines):
-        line_fit, plot_x, plot_y = self.fitter.fit_line(line_data[0], line_data[1], image_height)
-        best_fit, best_x, best_y = self.get_best_line_fit(plot_x, plot_y, old_lines, image_height)
+    def create_line(self, line_data, old_lines):
+        line_fit, plot_x, plot_y = self.fitter.fit_line(line_data[0], line_data[1])
+        best_fit, best_x, best_y = self.get_best_line_fit(plot_x, plot_y, old_lines)
         return Line(line_fit, plot_x, plot_y, best_fit, best_x, best_y)
 
     def add_new_line(self, image):
-        image_height = image.shape[0]
         if len(self.left_lines) > 0:
             left_line_fit, right_line_fit = self.get_best_fit_lines()
             left_line_data, right_line_data = self.slider.get_next_line(
@@ -43,8 +45,8 @@ class LastNLines:
         else:
             left_line_data, right_line_data = self.slider.get_initial_lines(image)
 
-        left_line = self.create_line(left_line_data, image_height, self.left_lines)
-        right_line = self.create_line(right_line_data, image_height, self.right_lines)
+        left_line = self.create_line(left_line_data, self.left_lines)
+        right_line = self.create_line(right_line_data, self.right_lines)
 
         self.left_lines.append(left_line)
         if len(self.left_lines) > self.n:
