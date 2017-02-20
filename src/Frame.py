@@ -37,15 +37,15 @@ class Frame:
         return self.bird_view_img
 
     def draw_line_area(self, left_line, right_line, s_points, d_points):
-        left_fit_x, l_plot_y = left_line.get_plot_coordinates(self.bird_view_img.shape[0])
-        right_fit_x, r_plot_y = right_line.get_plot_coordinates(self.bird_view_img.shape[0])
         # Create an image to draw the lines on
         warp_zero = np.zeros_like(self.bird_view_img).astype(np.uint8)
         color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
 
         # Recast the x and y points into usable format for cv2.fillPoly()
-        pts_left = np.array([np.transpose(np.vstack([left_fit_x, l_plot_y]))])
-        pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fit_x, r_plot_y])))])
+        pts_left = np.array([np.transpose(
+            np.vstack([left_line.all_x, left_line.all_y]))])
+        pts_right = np.array([np.flipud(np.transpose(
+            np.vstack([right_line.all_x, right_line.all_y])))])
         pts = np.hstack((pts_left, pts_right))
 
         # Draw the lane onto the warped blank image

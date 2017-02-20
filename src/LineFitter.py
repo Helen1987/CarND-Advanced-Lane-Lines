@@ -22,10 +22,18 @@ class LineFitter:
 
         return left_curverad, right_curverad
 
-    def get_line(self, x_left, y_left, x_right, y_right):
+    def get_plot_coordinates(self, image_height, line_fit):
+        plot_y = np.linspace(0, image_height - 1, image_height)
+        plot_x = line_fit[0]*plot_y**2+line_fit[1]*plot_y+line_fit[2]
+        return plot_x, plot_y
+
+    def get_line(self, image_height, x_left, y_left, x_right, y_right):
         left_fit = np.polyfit(y_left, x_left, 2)
         right_fit = np.polyfit(y_right, x_right, 2)
 
-        left_line = Line(left_fit, x_left.astype(np.int32), y_left)
-        right_line = Line(right_fit, x_right.astype(np.int32), y_right)
+        left_x, left_y = self.get_plot_coordinates(image_height, left_fit)
+        left_line = Line(left_fit, left_x, left_y)
+
+        right_x, right_y = self.get_plot_coordinates(image_height, right_fit)
+        right_line = Line(right_fit, right_x, right_y)
         return left_line, right_line

@@ -66,7 +66,8 @@ class ConvolutionalSlider:
         x_centroids, y_values = self._find_window_centroids(bv_image)
         left_x = np.array(x_centroids)[:, 0]
         right_x = np.array(x_centroids)[:, 1]
-        return self.fitter.get_line(left_x, y_values, right_x, y_values)
+        image_height = bv_image.shape[0]
+        return self.fitter.get_line(image_height, left_x, y_values, right_x, y_values)
 
     def _find_line_based_on_previous_line(self, bv_warped, left_fit, right_fit):
         non_zero = bv_warped.nonzero()
@@ -90,4 +91,5 @@ class ConvolutionalSlider:
     def get_next_line(self, bv_warped, left_fit, right_fit):
         left_data, right_data = self._find_line_based_on_previous_line(bv_warped, left_fit, right_fit)
 
-        return self.fitter.get_line(left_data[0], left_data[1], right_data[0], right_data[1])
+        image_height = bv_warped.shape[0]
+        return self.fitter.get_line(image_height, left_data[0], left_data[1], right_data[0], right_data[1])
