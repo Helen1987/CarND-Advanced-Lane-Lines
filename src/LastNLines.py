@@ -14,8 +14,13 @@ class LastNLines:
         pass
 
     def add_new_line(self, image):
-        self.slider.find_window_centroids(image)
-        left_line, right_line = self.slider.get_lines()
+        if len(self.left_lines) > 0:
+            left_line_fit, right_line_fit = self.get_best_fit_lines()
+            left_line, right_line = self.slider.get_next_line(
+                image, left_line_fit.best_fit, right_line_fit.best_fit)
+        else:
+            self.slider.find_window_centroids(image)
+            left_line, right_line = self.slider.get_lines()
         self.left_lines.append(left_line)
         if len(self.left_lines) > self.n:
             self.left_lines.popleft()

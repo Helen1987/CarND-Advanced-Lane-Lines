@@ -10,7 +10,7 @@ class Line:
         #average x values of the fitted line over the last n iterations
         self.bestx = None     
         #polynomial coefficients averaged over the last n iterations
-        self.best_fit = None  
+        self.best_fit = fit_coeff # so far
         #polynomial coefficients for the most recent fit
         self.current_fit = fit_coeff
         #radius of curvature of the line in some units

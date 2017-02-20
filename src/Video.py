@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import sys
 from moviepy.editor import VideoFileClip
 
 from .Frame import Frame
@@ -43,7 +44,8 @@ class Video:
 
             result = current_frame.draw_line_area(left, right, self.source_points, self.destination_points)
         except:
-             print('exeption')
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
         return result
 
     def process(self):
