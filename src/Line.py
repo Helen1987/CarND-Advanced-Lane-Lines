@@ -2,7 +2,11 @@ import numpy as np
 
 
 class Line:
-    def __init__(self, fit_coeff, x_values, y_values, best_coeff, x_best, y_best):
+    def __init__(self, fit_coeff, x_values, y_values, best_coeff, x_best, y_best, is_error, is_dangerous):
+        if is_error:
+            print("was taken previous line")
+        if is_dangerous:
+            print("too many errors on predicting")
         #average x values of the fitted line over the last n iterations
         self.best_x = x_best
         self.best_y = y_best
@@ -20,6 +24,8 @@ class Line:
         self.all_x = x_values
         #y values for detected line pixels
         self.all_y = y_values
+        self.is_error = is_error
+        self.is_dangerous = is_dangerous
 
     def get_line_points(self):
         return np.stack((self.all_x.astype(np.int32), self.all_y.astype(np.int32)), axis=-1)

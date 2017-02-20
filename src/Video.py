@@ -14,7 +14,7 @@ class Video:
         self.dist = dist
         self.path = path
         self.output_folder = os.path.join(os.getcwd(), output_folder)
-        self.last_n_lines = LastNLines(5)
+        self.last_n_lines = LastNLines(5, 30)
         self.source_points = None
         self.destination_points = None
 
@@ -51,7 +51,7 @@ class Video:
     def process(self):
         project_video = VideoFileClip(self.path)
         self._init_perspective_points(project_video.size[0], project_video.size[1])
-        self.last_n_lines.init(project_video.size[1])
+        self.last_n_lines.init(project_video.size[0], project_video.size[1])
 
         new_video = project_video.fl_image(self.handle_frame)
         output_file_name = os.path.join(self.output_folder, "result_" + self.path)
