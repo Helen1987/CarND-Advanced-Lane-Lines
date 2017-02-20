@@ -1,20 +1,17 @@
 import numpy as np
 
 from .LineFitter import LineFitter
-from .Line import Line
 
 
 class ConvolutionalSlider:
     def __init__(self, window_width, window_height, window_margin):
-        self.x_centroids = []
-        self.y_values = []
         self.window_height = window_height
         self.window_width = window_width
         self.window_margin = window_margin
         self.window = np.ones(window_width)  # sliding window for convolutions
         self.fitter = LineFitter(30/720, 3.7/700)
 
-    def find_initial_centroid(self, image):
+    def _find_initial_centroid(self, image):
         # Sum quarter bottom of image to get slice, could use a different ratio
         lower_level = int(3/4*image.shape[0])
         center_border = int(image.shape[1]/2)
@@ -26,7 +23,7 @@ class ConvolutionalSlider:
         r_center = np.argmax(np.convolve(self.window, r_sum)) - self.window_width / 2 + center_border
         return l_center, r_center
 
-    def find_next_level_centroids(self, bv_image, centroid, level):
+    def _find_next_level_centroids(self, bv_image, centroid, level):
         lower_border = int(bv_image.shape[0] - (level + 1) * self.window_height)
 
         # convolve the window into the vertical slice of the image
@@ -47,30 +44,31 @@ class ConvolutionalSlider:
         r_center = np.argmax(conv_signal[r_min_index:r_max_index])+r_min_index-offset
         return l_center, r_center
 
-    def find_window_centroids(self, bv_image):
-        self.x_centroids = []  # (left, right) window centroid positions per level
-        self.y_values = []
+    def _find_window_centroids(self, bv_image):
+        x_centroids = []  # (left, right) window centroid positions per level
+        y_values = []
         image_height = bv_image.shape[0]
 
         # first find the two starting positions for the left and right lane
-        centroid = self.find_initial_centroid(bv_image)
-        self.x_centroids.append(centroid)
-        self.y_values.append(image_height-int(self.window_height/2))
+        centroid = self._find_initial_centroid(bv_image)
+        x_centroids.append(centroid)
+        y_values.append(image_height-int(self.window_height/2))
 
         # go through each layer looking for max pixel locations
         levels_count = int(image_height/self.window_height)
         for level in range(1, levels_count):
-            centroid = self.find_next_level_centroids(bv_image, centroid, level)
-            self.x_centroids.append(centroid)
-            self.y_values.append(int(image_height-(level+0.5)*self.window_height))
+            centroid = self._find_next_level_centroids(bv_image, centroid, level)
+            x_centroids.append(centroid)
+            y_values.append(int(image_height-(level+0.5)*self.window_height))
+        return x_centroids, y_values
 
-    def get_lines(self):
-        left_fit, right_fit = self.fitter.fit_polynomial(self.x_centroids, self.y_values)
-        left_line = Line(left_fit, np.array(self.x_centroids, dtype=np.int32)[:, 0], self.y_values)
-        right_line = Line(right_fit, np.array(self.x_centroids, dtype=np.int32)[:, 1], self.y_values)
-        return left_line, right_line
+    def get_lines(self, bv_image):
+        x_centroids, y_values = self._find_window_centroids(bv_image)
+        left_x = np.array(x_centroids)[:, 0]
+        right_x = np.array(x_centroids)[:, 1]
+        return self.fitter.get_line(left_x, y_values, right_x, y_values)
 
-    def get_next_line(self, bv_warped, left_fit, right_fit):
+    def _find_line_based_on_previous_line(self, bv_warped, left_fit, right_fit):
         non_zero = bv_warped.nonzero()
         non_zero_y = np.array(non_zero[0])
         non_zero_x = np.array(non_zero[1])
@@ -87,16 +85,9 @@ class ConvolutionalSlider:
         left_y = non_zero_y[left_lane_inds]
         right_x = non_zero_x[right_lane_inds]
         right_y = non_zero_y[right_lane_inds]
-        # Fit a second order polynomial to each
-        left_fit = np.polyfit(left_y, left_x, 2)
-        right_fit = np.polyfit(right_y, right_x, 2)
-        left_line = Line(left_fit, left_x, left_y)
-        right_line = Line(right_fit, right_x, right_y)
-        return left_line, right_line
-        '''
-        # Generate x and y values for plotting
-        ploty = np.linspace(0, binary_warped.shape[0] - 1, binary_warped.shape[0])
-        left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
-        right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
-        '''
+        return (left_x, left_y), (right_x, right_y)
 
+    def get_next_line(self, bv_warped, left_fit, right_fit):
+        left_data, right_data = self._find_line_based_on_previous_line(bv_warped, left_fit, right_fit)
+
+        return self.fitter.get_line(left_data[0], left_data[1], right_data[0], right_data[1])

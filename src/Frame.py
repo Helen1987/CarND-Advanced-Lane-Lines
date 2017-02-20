@@ -51,8 +51,8 @@ class Frame:
         # Draw the lane onto the warped blank image
         cv2.fillPoly(color_warp, np.int_([pts]), (0, 255, 0))
 
-        cv2.polylines(color_warp, [left_line.get_line_points()], False, (255, 0, 255), thickness=40)
-        cv2.polylines(color_warp, [right_line.get_line_points()], False, (0, 0, 255), thickness=40)
+        #cv2.polylines(color_warp, [left_line.get_line_points()], False, (255, 0, 255), thickness=40)
+        #cv2.polylines(color_warp, [right_line.get_line_points()], False, (0, 0, 255), thickness=40)
 
         # Warp the blank back to original image space using inverse perspective matrix (Minv)
         matrix = cv2.getPerspectiveTransform(d_points, s_points.astype(np.float32))

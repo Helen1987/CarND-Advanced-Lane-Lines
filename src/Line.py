@@ -18,7 +18,7 @@ class Line:
         #distance in meters of vehicle center from the line
         self.line_base_pos = None 
         #difference in fit coefficients between last and new fits
-        self.diffs = np.array([0,0,0], dtype='float') 
+        self.diffs = np.array([0, 0, 0], dtype='float')
         #x values for detected line pixels
         self.allx = x_values
         #y values for detected line pixels
@@ -28,6 +28,11 @@ class Line:
     def get_plot_coordinates(self, image_height):
         plot_y = np.linspace(0, image_height - 1, image_height)
         plot_x = self.current_fit[0]*plot_y**2+self.current_fit[1]*plot_y+self.current_fit[2]
+        return plot_x, plot_y
+
+    def get_best_plot_coordinates(self, image_height):
+        plot_y = np.linspace(0, image_height - 1, image_height)
+        plot_x = self.best_fit[0]*plot_y**2+self.best_fit[1]*plot_y+self.best_fit[2]
         return plot_x, plot_y
 
     def get_line_points(self):

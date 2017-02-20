@@ -1,5 +1,7 @@
 import numpy as np
 
+from .Line import Line
+
 
 class LineFitter:
     def __init__(self, ym_per_pix, xm_per_pix):
@@ -20,10 +22,10 @@ class LineFitter:
 
         return left_curverad, right_curverad
 
-    def fit_polynomial(self, x_centroids, y_values):
-        left_x = np.array(x_centroids)[:, 0]
-        right_x = np.array(x_centroids)[:, 1]
-        left_fit = np.polyfit(y_values, left_x, 2)
-        right_fit = np.polyfit(y_values, right_x, 2)
+    def get_line(self, x_left, y_left, x_right, y_right):
+        left_fit = np.polyfit(y_left, x_left, 2)
+        right_fit = np.polyfit(y_right, x_right, 2)
 
-        return left_fit, right_fit
+        left_line = Line(left_fit, x_left.astype(np.int32), y_left)
+        right_line = Line(right_fit, x_right.astype(np.int32), y_right)
+        return left_line, right_line
