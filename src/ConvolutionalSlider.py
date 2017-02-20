@@ -8,7 +8,6 @@ class ConvolutionalSlider:
         self.window_margin = window_margin
         self.window = np.ones(window_width)  # sliding window for convolutions
 
-
     def _find_initial_centroid(self, image):
         # Sum quarter bottom of image to get slice, could use a different ratio
         lower_level = int(3/4*image.shape[0])
@@ -65,7 +64,6 @@ class ConvolutionalSlider:
         left_x = np.array(x_centroids)[:, 0]
         right_x = np.array(x_centroids)[:, 1]
         return (left_x, y_values), (right_x, y_values)
-        #return self.fitter.get_line(image_height, left_x, y_values, right_x, y_values)
 
     def get_next_line(self, bv_warped, left_fit, right_fit):
         non_zero = bv_warped.nonzero()
@@ -85,5 +83,3 @@ class ConvolutionalSlider:
         right_x = non_zero_x[right_lane_inds]
         right_y = non_zero_y[right_lane_inds]
         return (left_x, left_y), (right_x, right_y)
-
-        #return self.fitter.get_line(image_height, left_data[0], left_data[1], right_data[0], right_data[1])

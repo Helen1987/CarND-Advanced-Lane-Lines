@@ -17,17 +17,18 @@ class LastNLines:
     def passed_sanity_check(self):
         pass
 
-    def average_line(self, line_to_average, old_lines):
-        all_x = np.array(line_to_average.all_x)
-        all_y = np.array(line_to_average.all_y)
+    def get_best_line_fit(self, x, y, old_lines, image_height):
+        all_x = x[:]
+        all_y = y[:]
         for line in old_lines:
-            all_x.append(line.all_x)
-            all_y.append(line.all_y)
+            all_x = np.append(all_x, line.all_x)
+            all_y = np.append(all_y, line.all_y)
+        return self.fitter.fit_line(all_x, all_y, image_height)
 
-    def create_line(self, line_data, image_height):
-        line_fit = self.fitter.fit_line(line_data[0], line_data[1])
-        plot_x, plot_y = self.fitter.get_plot_coordinates(image_height, line_fit)
-        return Line(line_fit, plot_x, plot_y)
+    def create_line(self, line_data, image_height, old_lines):
+        line_fit, plot_x, plot_y = self.fitter.fit_line(line_data[0], line_data[1], image_height)
+        best_fit, best_x, best_y = self.get_best_line_fit(plot_x, plot_y, old_lines, image_height)
+        return Line(line_fit, plot_x, plot_y, best_fit, best_x, best_y)
 
     def add_new_line(self, image):
         image_height = image.shape[0]
@@ -42,8 +43,8 @@ class LastNLines:
         else:
             left_line_data, right_line_data = self.slider.get_initial_lines(image)
 
-        left_line = self.create_line(left_line_data, image_height)
-        right_line = self.create_line(right_line_data, image_height)
+        left_line = self.create_line(left_line_data, image_height, self.left_lines)
+        right_line = self.create_line(right_line_data, image_height, self.right_lines)
 
         self.left_lines.append(left_line)
         if len(self.left_lines) > self.n:

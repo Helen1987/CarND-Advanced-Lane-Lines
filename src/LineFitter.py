@@ -20,10 +20,9 @@ class LineFitter:
 
         return left_curverad, right_curverad
 
-    def get_plot_coordinates(self, image_height, line_fit):
-        plot_y = np.linspace(0, image_height - 1, image_height)
-        plot_x = line_fit[0]*plot_y**2+line_fit[1]*plot_y+line_fit[2]
-        return plot_x, plot_y
+    def fit_line(self, x_left, y_left, image_height):
+        line_fit = np.polyfit(y_left, x_left, 2)
 
-    def fit_line(self, x_left, y_left):
-        return np.polyfit(y_left, x_left, 2)
+        plot_y = np.linspace(0, image_height - 1, image_height)
+        plot_x = line_fit[0] * plot_y ** 2 + line_fit[1] * plot_y + line_fit[2]
+        return line_fit, plot_x, plot_y

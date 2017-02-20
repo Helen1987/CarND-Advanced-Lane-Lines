@@ -2,16 +2,12 @@ import numpy as np
 
 
 class Line:
-    def __init__(self, fit_coeff, x_values, y_values):
-        # was the line detected in the last iteration?
-        self.detected = False  
-        # x values of the last n fits of the line
-        self.recent_xfitted = [] 
+    def __init__(self, fit_coeff, x_values, y_values, best_coeff, x_best, y_best):
         #average x values of the fitted line over the last n iterations
-        self.best_x = None
-        self.best_y = None
+        self.best_x = x_best
+        self.best_y = y_best
         #polynomial coefficients averaged over the last n iterations
-        self.best_fit = fit_coeff # so far
+        self.best_fit = best_coeff # so far
         #polynomial coefficients for the most recent fit
         self.current_fit = fit_coeff
         #radius of curvature of the line in some units
@@ -24,3 +20,6 @@ class Line:
         self.all_x = x_values
         #y values for detected line pixels
         self.all_y = y_values
+
+    def get_line_points(self):
+        return np.stack((self.all_x.astype(np.int32), self.all_y.astype(np.int32)), axis=-1)
