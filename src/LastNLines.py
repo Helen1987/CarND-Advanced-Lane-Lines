@@ -1,6 +1,9 @@
+import numpy as np
 from collections import deque
 
 from .ConvolutionalSlider import ConvolutionalSlider
+from .LineFitter import LineFitter
+from .Line import Line
 
 
 class LastNLines:
@@ -9,21 +12,39 @@ class LastNLines:
         self.right_lines = deque([])
         self.left_lines = deque([])
         self.slider = ConvolutionalSlider(50, 80, 100)
+        self.fitter = LineFitter(30 / 720, 3.7 / 700)
 
     def passed_sanity_check(self):
         pass
 
+    def average_line(self, line_to_average, old_lines):
+        all_x = np.array(line_to_average.all_x)
+        all_y = np.array(line_to_average.all_y)
+        for line in old_lines:
+            all_x.append(line.all_x)
+            all_y.append(line.all_y)
+
+    def create_line(self, line_data, image_height):
+        line_fit = self.fitter.fit_line(line_data[0], line_data[1])
+        plot_x, plot_y = self.fitter.get_plot_coordinates(image_height, line_fit)
+        return Line(line_fit, plot_x, plot_y)
+
     def add_new_line(self, image):
+        image_height = image.shape[0]
         if len(self.left_lines) > 0:
             left_line_fit, right_line_fit = self.get_best_fit_lines()
-            left_line, right_line = self.slider.get_next_line(
+            left_line_data, right_line_data = self.slider.get_next_line(
                 image, left_line_fit.best_fit, right_line_fit.best_fit)
             # if line passed_sanity_check == False
             # self.slider.get_lines()
             # if line passed_sanity_check == False
             # self.slider.get_best_fit_lines
         else:
-            left_line, right_line = self.slider.get_lines(image)
+            left_line_data, right_line_data = self.slider.get_initial_lines(image)
+
+        left_line = self.create_line(left_line_data, image_height)
+        right_line = self.create_line(right_line_data, image_height)
+
         self.left_lines.append(left_line)
         if len(self.left_lines) > self.n:
             self.left_lines.popleft()

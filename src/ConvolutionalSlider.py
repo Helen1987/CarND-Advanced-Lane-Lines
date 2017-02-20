@@ -1,7 +1,5 @@
 import numpy as np
 
-from .LineFitter import LineFitter
-
 
 class ConvolutionalSlider:
     def __init__(self, window_width, window_height, window_margin):
@@ -9,7 +7,7 @@ class ConvolutionalSlider:
         self.window_width = window_width
         self.window_margin = window_margin
         self.window = np.ones(window_width)  # sliding window for convolutions
-        self.fitter = LineFitter(30/720, 3.7/700)
+
 
     def _find_initial_centroid(self, image):
         # Sum quarter bottom of image to get slice, could use a different ratio
@@ -62,14 +60,14 @@ class ConvolutionalSlider:
             y_values.append(int(image_height-(level+0.5)*self.window_height))
         return x_centroids, y_values
 
-    def get_lines(self, bv_image):
+    def get_initial_lines(self, bv_image):
         x_centroids, y_values = self._find_window_centroids(bv_image)
         left_x = np.array(x_centroids)[:, 0]
         right_x = np.array(x_centroids)[:, 1]
-        image_height = bv_image.shape[0]
-        return self.fitter.get_line(image_height, left_x, y_values, right_x, y_values)
+        return (left_x, y_values), (right_x, y_values)
+        #return self.fitter.get_line(image_height, left_x, y_values, right_x, y_values)
 
-    def _find_line_based_on_previous_line(self, bv_warped, left_fit, right_fit):
+    def get_next_line(self, bv_warped, left_fit, right_fit):
         non_zero = bv_warped.nonzero()
         non_zero_y = np.array(non_zero[0])
         non_zero_x = np.array(non_zero[1])
@@ -88,8 +86,4 @@ class ConvolutionalSlider:
         right_y = non_zero_y[right_lane_inds]
         return (left_x, left_y), (right_x, right_y)
 
-    def get_next_line(self, bv_warped, left_fit, right_fit):
-        left_data, right_data = self._find_line_based_on_previous_line(bv_warped, left_fit, right_fit)
-
-        image_height = bv_warped.shape[0]
-        return self.fitter.get_line(image_height, left_data[0], left_data[1], right_data[0], right_data[1])
+        #return self.fitter.get_line(image_height, left_data[0], left_data[1], right_data[0], right_data[1])
