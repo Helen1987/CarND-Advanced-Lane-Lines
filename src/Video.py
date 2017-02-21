@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import sys
+import cv2
 from moviepy.editor import VideoFileClip
 
 from .Frame import Frame
@@ -15,34 +16,37 @@ class Video:
         self.path = path
         self.output_folder = os.path.join(os.getcwd(), output_folder)
         self.last_n_lines = LastNLines(5, 20)
-        self.source_points = None
-        self.destination_points = None
+        self.matrix = None
+        self.inverse_matrix = None
 
     def _init_perspective_points(self, width, height):
         top_offset = 110
         bottom_offset = 10
         top_line_offset = 110
 
-        self.source_points = np.float32([
+        s_points = np.float32([
             (0, height-bottom_offset),
             (width/2-top_line_offset, height/2+top_offset),
             (width/2+top_line_offset, height/2+top_offset),
             (width, height-bottom_offset)])
         
         offset = 100
-        self.destination_points = np.float32([
+        d_points = np.float32([
             [offset, height], [offset, 0],
             [width-offset, 0], [width-offset, height]])
+
+        self.matrix = cv2.getPerspectiveTransform(s_points, d_points)
+        self.inverse_matrix = cv2.getPerspectiveTransform(d_points, s_points)
 
     def handle_frame(self, image):
         try:
             current_frame = Frame(image, self.mtx, self.dist)
-            bird_view_img = current_frame.preprocess_frame(self.source_points, self.destination_points)
+            bird_view_img = current_frame.preprocess_frame(self.matrix)
 
             self.last_n_lines.add_new_line(bird_view_img)
             left, right = self.last_n_lines.get_best_fit_lines()
 
-            result = current_frame.draw_line_area(left, right, self.source_points, self.destination_points)
+            result = current_frame.draw_line_area(left, right, self.inverse_matrix)
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
