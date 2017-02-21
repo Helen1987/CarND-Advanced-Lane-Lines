@@ -12,36 +12,33 @@ class LastNLines:
         self.MAX_STD = max_std
         self.right_lines = deque([])
         self.left_lines = deque([])
-        self.slider = ConvolutionalSlider(50, 80, max_std*3)
+        self.slider = ConvolutionalSlider(50, 80, max_std*5)
         self.fitter = None
         self.MIN_LINES_DISTANCE = 0
         self.is_error_line = False
         self.errors_in_a_raw = 0
         self.CRITICAL_ERRORS_COUNT = 10
+        self.roots_limit = None
 
     def init(self, width, height):
         self.fitter = LineFitter(height, 30 / 720, 3.7 / 700)
-        self.MIN_LINES_DISTANCE = int(width / 2.5) # diff between lines can't be less
+        self.MIN_LINES_DISTANCE = int(width / 2) # diff between lines can't be less
+        self.roots_limit = [-height, height]
 
     def filter_dots(self, x, y):
-        #std = np.std(x)
-        #if std > self.MAX_STD:
-        #    return None, None
-        std_ind = np.zeros_like(x, dtype=np.bool)
-        for i in range(1, len(x)-1):
-            top2 = x[i+1]-x[i]
-            bottom2 = x[i]-x[i-1]
-            std_ind[i] = (abs(top2) < self.MAX_STD) and (abs(bottom2) < self.MAX_STD) and top2*bottom2 > 0
-
-        # check first and last
-        std_ind[0] = (abs(x[1]-x[0]) < self.MAX_STD)
-        std_ind[-1] = (abs(x[-1]-x[-2]) < self.MAX_STD)
-        #print(std_ind)
-        #std_ind = x < np.median(x) + self.MAX_STD
+        std_ind = (x - np.median(x)) < 2*np.std(x)
         return x[std_ind], np.array(y)[std_ind]
 
     def passed_sanity_check(self, left, right):
-        if not(np.median(right[0])-np.median(left[0]) > self.MIN_LINES_DISTANCE):
+        diff = np.median(right[0])-np.median(left[0])
+        if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 200)):
+            return False
+        # check if line intersect
+        left_fit = self.fitter.fit_line(left[0], left[1])
+        right_fit = self.fitter.fit_line(right[0], right[1])
+        coeff = right_fit - left_fit
+        roots = np.roots(coeff)
+        if ((roots[0] > self.roots_limit[0]) and (roots[0] < self.roots_limit[1])) or ((roots[1] > self.roots_limit[0]) and (roots[1] < self.roots_limit[1])):
             return False
         return True
 
@@ -51,11 +48,11 @@ class LastNLines:
         for line in old_lines:
             all_x = np.append(all_x, line.all_x)
             all_y = np.append(all_y, line.all_y)
-        return self.fitter.fit_line(all_x, all_y)
+        return self.fitter.get_line_data(all_x, all_y)
 
     def create_line(self, line_data, old_lines):
         x_original, y_original = self.filter_dots(line_data[0], line_data[1])
-        line_fit, plot_x, plot_y = self.fitter.fit_line(x_original, y_original)
+        line_fit, plot_x, plot_y = self.fitter.get_line_data(x_original, y_original)
         best_fit, best_x, best_y = self.get_best_line_fit(plot_x, plot_y, old_lines)
         return Line(line_fit, plot_x, plot_y,
                     best_fit, best_x, best_y,
@@ -64,14 +61,14 @@ class LastNLines:
     def add_new_line(self, image):
         self.is_error_line = 0
         if len(self.left_lines) > 0:
-            left_line_fit, right_line_fit = self.get_best_fit_lines()
+            prev_left_line, prev_right_line = self.get_best_fit_lines()
             left_line_data, right_line_data = self.slider.get_next_line(
-                image, left_line_fit.best_fit, right_line_fit.best_fit)
+                image, prev_left_line.best_fit, prev_right_line.best_fit)
             if not(self.passed_sanity_check(left_line_data, right_line_data)):
                 left_line_data, right_line_data = self.slider.get_initial_lines(image)
                 if not(self.passed_sanity_check(left_line_data, right_line_data)):
-                    left_line_data = (left_line_fit.all_x, left_line_fit.all_y)
-                    right_line_data = (right_line_fit.all_x, right_line_data.all_y)
+                    left_line_data = (prev_left_line.best_x, prev_left_line.best_y)
+                    right_line_data = (prev_right_line.best_x, prev_right_line.best_y)
                     self.errors_in_a_raw += 1
             else:
                 self.errors_in_a_raw = 0

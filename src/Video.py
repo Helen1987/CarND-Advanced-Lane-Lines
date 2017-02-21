@@ -14,7 +14,7 @@ class Video:
         self.dist = dist
         self.path = path
         self.output_folder = os.path.join(os.getcwd(), output_folder)
-        self.last_n_lines = LastNLines(5, 30)
+        self.last_n_lines = LastNLines(5, 20)
         self.source_points = None
         self.destination_points = None
 

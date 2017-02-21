@@ -7,6 +7,7 @@ class Line:
             print("was taken previous line")
         if is_dangerous:
             print("too many errors on predicting")
+
         #average x values of the fitted line over the last n iterations
         self.best_x = x_best
         self.best_y = y_best
