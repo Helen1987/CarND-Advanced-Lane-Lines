@@ -17,7 +17,7 @@ class Frame:
         limg = cv2.merge((cl, a, b))
         return cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
 
-    def _get_thresholded_image(self, undistorted, s_thresh=(220, 255), sx_thresh=(40, 60), v_thresh=(200, 240)):
+    def _get_thresholded_image(self, undistorted, s_thresh=(190, 255), sx_thresh=(30, 80), v_thresh=(200, 240)):
         #hsv = cv2.cvtColor(undistorted, cv2.COLOR_RGB2HSV).astype(np.float)
         #v_channel = hsv[:, :, 2]
 
