@@ -12,7 +12,7 @@ class LastNLines:
         self.MAX_STD = max_std
         self.right_lines = deque([])
         self.left_lines = deque([])
-        self.slider = ConvolutionalSlider(50, 80, max_std*5)
+        self.slider = ConvolutionalSlider(50, 80, max_std*4)
         self.fitter = None
         self.MIN_LINES_DISTANCE = 0
         self.is_error_line = False

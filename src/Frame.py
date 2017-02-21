@@ -1,15 +1,25 @@
 import cv2
 import numpy as np
 
+BLUR_KERNEL = 3
 
 class Frame:
     def __init__(self, img, mtx, dist):
         self.img = cv2.undistort(img, mtx, dist, None, mtx)
         self.bird_view_img = None
 
-    def _get_thresholded_image(self, undistorted, s_thresh=(170, 255), sx_thresh=(20, 100), v_thresh=(200, 240)):
-        hsv = cv2.cvtColor(undistorted, cv2.COLOR_RGB2HSV).astype(np.float)
-        v_channel = hsv[:, :, 2]
+    def _equalize(self, img):
+        lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab)
+
+        cl = cv2.equalizeHist(l)
+
+        limg = cv2.merge((cl, a, b))
+        return cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+
+    def _get_thresholded_image(self, undistorted, s_thresh=(220, 255), sx_thresh=(40, 60), v_thresh=(200, 240)):
+        #hsv = cv2.cvtColor(undistorted, cv2.COLOR_RGB2HSV).astype(np.float)
+        #v_channel = hsv[:, :, 2]
 
         hls = cv2.cvtColor(undistorted, cv2.COLOR_RGB2HLS).astype(np.float)
         l_channel = hls[:, :, 1]
@@ -23,7 +33,7 @@ class Frame:
         binary = np.zeros_like(s_channel)
         binary[
             ((s_channel >= s_thresh[0]) & (s_channel <= s_thresh[1]))
-            | ((v_channel >= v_thresh[0]) & (v_channel <= v_thresh[1]))
+            #| ((v_channel >= v_thresh[0]) & (v_channel <= v_thresh[1]))
             | ((scaled_sobel > sx_thresh[0]) & (scaled_sobel < sx_thresh[1]))] = 1
         return binary
 
@@ -31,7 +41,9 @@ class Frame:
         return cv2.warpPerspective(img, matrix, (img.shape[1], img.shape[0]))
 
     def preprocess_frame(self, matrix):
-        img = self._get_thresholded_image(self.img)
+        equ = self._equalize(self.img)
+        blured = cv2.GaussianBlur(equ, (BLUR_KERNEL, BLUR_KERNEL), 0)
+        img = self._get_thresholded_image(blured)
         self.bird_view_img = self._bird_view_transformation(img, matrix)
         return self.bird_view_img
 
