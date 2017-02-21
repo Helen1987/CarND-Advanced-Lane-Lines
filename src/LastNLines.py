@@ -17,12 +17,12 @@ class LastNLines:
         self.MIN_LINES_DISTANCE = 0
         self.is_error_line = False
         self.errors_in_a_raw = 0
-        self.CRITICAL_ERRORS_COUNT = 10
+        self.CRITICAL_ERRORS_COUNT = 20
         self.roots_limit = None
 
     def init(self, width, height):
         self.fitter = LineFitter(height, 30 / 720, 3.7 / 700)
-        self.MIN_LINES_DISTANCE = int(width / 2) # diff between lines can't be less
+        self.MIN_LINES_DISTANCE = int(width / 1.9) # diff between lines can't be less
         self.roots_limit = [-height, height]
 
     def filter_dots(self, x, y):
@@ -31,7 +31,7 @@ class LastNLines:
 
     def passed_sanity_check(self, left, right):
         diff = np.median(right[0])-np.median(left[0])
-        if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 200)):
+        if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 120)):
             return False
         # check if line intersect
         left_fit = self.fitter.fit_line(left[0], left[1])
@@ -43,11 +43,21 @@ class LastNLines:
         return True
 
     def get_best_line_fit(self, x, y, old_lines):
+        percentage_coef = 0.9/self.n
+        current_coef = percentage_coef
+
         all_x = x[:]
         all_y = y[:]
         for line in old_lines:
-            all_x = np.append(all_x, line.all_x)
-            all_y = np.append(all_y, line.all_y)
+            data_to_take = current_coef*len(line.best_x)
+            choice = np.random.choice(len(line.best_x), data_to_take)
+
+            all_x = np.append(all_x, line.best_x[choice])
+            all_y = np.append(all_y, line.best_y[choice])
+
+            current_coef += percentage_coef
+
+        assert current_coef < 1
         return self.fitter.get_line_data(all_x, all_y)
 
     def create_line(self, line_data, old_lines):
@@ -79,10 +89,10 @@ class LastNLines:
         right_line = self.create_line(right_line_data, self.right_lines)
 
         self.left_lines.append(left_line)
-        if len(self.left_lines) > self.n:
+        if len(self.left_lines) >= self.n:
             self.left_lines.popleft()
         self.right_lines.append(right_line)
-        if len(self.right_lines) > self.n:
+        if len(self.right_lines) >= self.n:
             self.right_lines.popleft()
 
     def get_best_fit_lines(self):
