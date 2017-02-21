@@ -22,7 +22,7 @@ class LastNLines:
 
     def init(self, width, height):
         self.fitter = LineFitter(height, 30 / 720, 3.7 / 700)
-        self.MIN_LINES_DISTANCE = int(width / 1.9) # diff between lines can't be less
+        self.MIN_LINES_DISTANCE = int(width / 1.7) # diff between lines can't be less
         self.roots_limit = [-height, height]
 
     def filter_dots(self, x, y):
@@ -31,7 +31,7 @@ class LastNLines:
 
     def passed_sanity_check(self, left, right):
         diff = np.median(right[0])-np.median(left[0])
-        if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 120)):
+        if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 250)):
             return False
         # check if line intersect
         left_fit = self.fitter.fit_line(left[0], left[1])

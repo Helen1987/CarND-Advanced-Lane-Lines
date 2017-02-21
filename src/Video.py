@@ -20,15 +20,16 @@ class Video:
         self.inverse_matrix = None
 
     def _init_perspective_points(self, width, height):
-        top_offset = 110
-        bottom_offset = 10
-        top_line_offset = 110
+        top_offset = 100
+        bottom_offset = 40
+        top_line_offset = 80
+        bottom_line_offset = 145
 
         s_points = np.float32([
-            (0, height-bottom_offset),
+            (bottom_line_offset, height-bottom_offset),
             (width/2-top_line_offset, height/2+top_offset),
             (width/2+top_line_offset, height/2+top_offset),
-            (width, height-bottom_offset)])
+            (width-bottom_line_offset, height-bottom_offset)])
         
         offset = 100
         d_points = np.float32([
