@@ -8,6 +8,27 @@ class Frame:
         self.img = cv2.undistort(img, mtx, dist, None, mtx)
         self.bird_view_img = None
 
+    @staticmethod
+    def init(width, height):
+        top_offset = 100
+        bottom_offset = 40
+        top_line_offset = 80
+        bottom_line_offset = 145
+
+        s_points = np.float32([
+            (bottom_line_offset, height - bottom_offset),
+            (width / 2 - top_line_offset, height / 2 + top_offset),
+            (width / 2 + top_line_offset, height / 2 + top_offset),
+            (width - bottom_line_offset, height - bottom_offset)])
+
+        offset = 100
+        d_points = np.float32([
+            [offset, height], [offset, 0],
+            [width - offset, 0], [width - offset, height]])
+
+        Frame.matrix = cv2.getPerspectiveTransform(s_points, d_points)
+        Frame.inverse_matrix = cv2.getPerspectiveTransform(d_points, s_points)
+
     def _equalize(self, img):
         lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
         l, a, b = cv2.split(lab)
@@ -37,17 +58,17 @@ class Frame:
             | ((scaled_sobel > sx_thresh[0]) & (scaled_sobel < sx_thresh[1]))] = 1
         return binary
 
-    def _bird_view_transformation(self, img, matrix):
-        return cv2.warpPerspective(img, matrix, (img.shape[1], img.shape[0]))
+    def _bird_view_transformation(self, img):
+        return cv2.warpPerspective(img, Frame.matrix, (img.shape[1], img.shape[0]))
 
-    def preprocess_frame(self, matrix):
+    def preprocess_frame(self):
         equ = self._equalize(self.img)
         blured = cv2.GaussianBlur(equ, (BLUR_KERNEL, BLUR_KERNEL), 0)
         img = self._get_thresholded_image(blured)
-        self.bird_view_img = self._bird_view_transformation(img, matrix)
+        self.bird_view_img = self._bird_view_transformation(img)
         return self.bird_view_img
 
-    def draw_line_area(self, left_line, right_line, inverse_matrix):
+    def draw_line_area(self, left_line, right_line):
         # Create an image to draw the lines on
         warp_zero = np.zeros_like(self.bird_view_img).astype(np.uint8)
         color_warp = np.dstack((warp_zero, warp_zero, warp_zero))
@@ -67,6 +88,6 @@ class Frame:
 
         # Warp the blank back to original image space using inverse perspective matrix (Minv)
 
-        new_warp = cv2.warpPerspective(color_warp, inverse_matrix, (self.img.shape[1], self.img.shape[0]))
+        new_warp = cv2.warpPerspective(color_warp, Frame.inverse_matrix, (self.img.shape[1], self.img.shape[0]))
         # Combine the result with the original image
         return cv2.addWeighted(self.img, 1, new_warp, 0.3, 0)

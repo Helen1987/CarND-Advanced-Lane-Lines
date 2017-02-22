@@ -16,38 +16,16 @@ class Video:
         self.path = path
         self.output_folder = os.path.join(os.getcwd(), output_folder)
         self.last_n_lines = LastNLines(5, 20)
-        self.matrix = None
-        self.inverse_matrix = None
-
-    def _init_perspective_points(self, width, height):
-        top_offset = 100
-        bottom_offset = 40
-        top_line_offset = 80
-        bottom_line_offset = 145
-
-        s_points = np.float32([
-            (bottom_line_offset, height-bottom_offset),
-            (width/2-top_line_offset, height/2+top_offset),
-            (width/2+top_line_offset, height/2+top_offset),
-            (width-bottom_line_offset, height-bottom_offset)])
-        
-        offset = 100
-        d_points = np.float32([
-            [offset, height], [offset, 0],
-            [width-offset, 0], [width-offset, height]])
-
-        self.matrix = cv2.getPerspectiveTransform(s_points, d_points)
-        self.inverse_matrix = cv2.getPerspectiveTransform(d_points, s_points)
 
     def handle_frame(self, image):
         try:
             current_frame = Frame(image, self.mtx, self.dist)
-            bird_view_img = current_frame.preprocess_frame(self.matrix)
+            bird_view_img = current_frame.preprocess_frame()
 
             self.last_n_lines.add_new_line(bird_view_img)
             left, right = self.last_n_lines.get_best_fit_lines()
 
-            result = current_frame.draw_line_area(left, right, self.inverse_matrix)
+            result = current_frame.draw_line_area(left, right)
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
@@ -55,7 +33,7 @@ class Video:
 
     def process(self):
         project_video = VideoFileClip(self.path)
-        self._init_perspective_points(project_video.size[0], project_video.size[1])
+        Frame.init(project_video.size[0], project_video.size[1])
         self.last_n_lines.init(project_video.size[0], project_video.size[1])
 
         new_video = project_video.fl_image(self.handle_frame)
