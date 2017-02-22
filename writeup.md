@@ -28,14 +28,14 @@ The goals / steps of this project are the following:
 ---
 ###Writeup / README
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.
 
 You're reading it!
 ###Camera Calibration
 
 ####1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
-To calibrate camera I use [IPython notebook](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/research/Calibration.ipynb).
+To calibrate camera I use [IPython notebook](/research/Calibration.ipynb).
 
 I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. I can find them with `cv2.findChessboardCorners`. The result chessboard is the same chessboard for all images on a plane z=0. So I need to create an array of (x, y) coordinates for expected 9x6 chessboard. Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
@@ -49,7 +49,7 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 ####1. Provide an example of a distortion-corrected image.
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
 ![alt text][or_road]
-The code of transorming the image into "bird-view" image you can find in my [Frame class](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/Frame.py)
+The code of transorming the image into "bird-view" image you can find in my [Frame class](/src/Frame.py)
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
 
@@ -57,7 +57,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-For all frames I use the same source and destination points. I initialize `source_points` and `destination_points` once in `_init_perspective_points` method of [Video class](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/Video.py) based on video image size. For region of interest I choose the region you can see on image below.
+For all frames I use the same source and destination points. I initialize `source_points` and `destination_points` once in `_init_perspective_points` method of [Video class](/src/Video.py) based on video image size. For region of interest I choose the region you can see on image below.
 
 ![alt text][roi]
 
@@ -70,7 +70,7 @@ This resulted in the following source and destination points:
 | 1127, 720     | 960, 720      |
 | 695, 460      | 960, 0        |
 
-Actual transformation happens in `_bird_view_transformation` method of [Frame class](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/Frame.py). The function takes as inputs an image, source and destination points. 
+Actual transformation happens in `_bird_view_transformation` method of [Frame class](/src/Frame.py). The function takes as inputs an image, source and destination points. 
 
 On resulted warped image lines are parallel, so my points are correct
 
@@ -78,13 +78,13 @@ On resulted warped image lines are parallel, so my points are correct
 
 ####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-To identify lane-line pixels I use convolutional slider approach and search based on previous line position. The code you can find in [ConvolutionalSlide class](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/ConvolutionalSlider.py). 
+To identify lane-line pixels I use convolutional slider approach and search based on previous line position. The code you can find in [ConvolutionalSlide class](/src/ConvolutionalSlider.py). 
 
-Actually, I use convolution to find lines on ther first image or in case when the second approach did not gave sensible results. The logic of choosing the right appoach you can find in [`add_new_line` method](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/LastNLines.py#L36) of [LastNLines class](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/LastNLines.py). Convolutional approach you can find in [`get_initial_lines` method](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/ConvolutionalSlider.py#L62)
+Actually, I use convolution to find lines on ther first image or in case when the second approach did not gave sensible results. The logic of choosing the right appoach you can find in [`add_new_line` method](/src/LastNLines.py#L36) of [LastNLines class](/src/LastNLines.py). Convolutional approach you can find in [`get_initial_lines` method](/src/ConvolutionalSlider.py#L62)
 
-When I have the data from previous line I was able to use it to identify the next line in the same region with some margin. You can find the code in [`get_next_line` method](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/ConvolutionalSlider.py#L68)
+When I have the data from previous line I was able to use it to identify the next line in the same region with some margin. You can find the code in [`get_next_line` method](/src/ConvolutionalSlider.py#L68)
 
-To calculate information about identified line I use [`LineFitter` class](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/LineFitter.py). Specifically, in [`fit_line` method](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/LineFitter.py#L24) I fit a line into the second order polynomial and returned data which can be used to draw the resulted line.
+To calculate information about identified line I use [`LineFitter` class](/src/LineFitter.py). Specifically, in [`fit_line` method](/src/LineFitter.py#L24) I fit a line into the second order polynomial and returned data which can be used to draw the resulted line.
 
 To fit line better I use different techniques:
 1. Removing outliers which deviates too much from the median
@@ -94,11 +94,11 @@ To fit line better I use different techniques:
 
 ####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-The code you can find in [`calculate_curvature`](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/LineFitter.py#L11) method. To scale the result I use data from lectures about the USA road lane line.
+The code you can find in [`calculate_curvature`](/src/LineFitter.py#L11) method. To scale the result I use data from lectures about the USA road lane line.
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-You can find the code in [`draw_line_area` method](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/src/Frame.py#L39).
+You can find the code in [`draw_line_area` method](/src/Frame.py#L39).
 
 First of all I draw the region between two line using best fit data. Then I apply `cv2.warpPerspective` on our bird-view image but with a matrix for inverse transformation. In result we get our final image.
 
@@ -118,13 +118,18 @@ First of all I draw the region between two line using best fit data. Then I appl
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-My first step was to create a basic pipeline. Actually, on the first video I got pretty good result if do not take into consideration cement areas. My next step was to use a technique of lane finding based on previous line. It gave very nice results for the first video and I was able to pass the cement area in a nice way.
+My first step was to create a basic pipeline. Actually, on the first video I got pretty good result right away if do not take into consideration cement areas. My next step was to introduce a technique of lane finding based on previous line. It gave very nice results for the first video and I was able to pass the cement area in a nice way.
 
 Then I had two possible ways to improve my pipeline:
-1. To improve the way to identify line pixel
-2. To use some math techniques and sanity checks for identified pixels
 
-I started from the second part since it is easier to test the result when lines are not identified perfectly. When I was satisfied with the result I switched to the first point.
+1. To improve the way of identifying line pixel
+2. Use some math considerations and sanity checks for identified pixels
 
-My pipeline is pretty robust, though I doubt it would work at night. I want to remove some const to a config file or calculate them dinamically based on picture size.
+I started from the second part since it is easier to test the result when lines are not identified perfectly. I introduced some sanity checks (lines do not intersect and far enough from each other). When I was satisfied with the result I switched to the first point.
+
+My pipeline is not robust enough as we can see on the second and the third video. Though histogram normalization improved situation a lot, I still have a lot of issues with line detection. And I doubt I can predict lines at night. I have to improve the thresholding part to make it robust to different conditions.
+
+Also it is possible to notice that on the third video when the right line is not visible, my pipeline goes crazy. I need to overcome such situations as well.
+
+I want to remove some const to a config file or calculate them dinamically based on picture size.
 
