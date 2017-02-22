@@ -100,6 +100,6 @@ class Frame:
         curvature_text = 'Curvature left: ' + str(left_line.radius_of_curvature) + ' m, curvature right: ' + str(right_line.radius_of_curvature) + ' m'
         font = cv2.FONT_HERSHEY_SIMPLEX
         result = cv2.putText(result, curvature_text, (10, 40), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-        distanse = str((right_line.best_x[0]-left_line.best_x[0])*(3.7/900)) + ' m'
-        distanse_text = 'Distance between lines is ' + distanse
+        distanse = str((1280/2 - (right_line.best_x[0]-left_line.best_x[0])/2)*(3.7/(right_line.best_x[0]-left_line.best_x[0]))) + ' m'
+        distanse_text = 'Distance from center is ' + distanse
         return cv2.putText(result, distanse_text, (10, 80), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
