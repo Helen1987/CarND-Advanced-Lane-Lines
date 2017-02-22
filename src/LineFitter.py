@@ -8,18 +8,14 @@ class LineFitter:
         self.xm_per_pix = xm_per_pix # meters per pixel in x dimension
         self.image_height = height
 
-    def calculate_curvature(self, unscaled_y_values, unscaled_left_fit, unscaled_right_fit):
-        scaled_y = unscaled_y_values * self.ym_per_pix
+    def calculate_curvature(self, unscaled_x, unscaled_y):
+        scaled_y = unscaled_y * self.ym_per_pix
         # Define y-value where we want radius of curvature
         # I'll choose the maximum y-value, corresponding to the bottom of the image
         y_eval = np.max(scaled_y)
-        left_fit = np.polyfit(scaled_y, unscaled_left_fit*self.xm_per_pix, 2)
-        right_fit = np.polyfit(scaled_y, unscaled_right_fit*self.xm_per_pix, 2)
+        fit = self.fit_line(unscaled_x*self.xm_per_pix, scaled_y)
 
-        left_curverad = ((1+(2*left_fit[0]*y_eval+left_fit[1])**2)**1.5)/np.absolute(2*left_fit[0])
-        right_curverad = ((1+(2*right_fit[0]*y_eval+right_fit[1])**2)**1.5)/np.absolute(2*right_fit[0])
-
-        return left_curverad, right_curverad
+        return ((1+(2*fit[0]*y_eval+fit[1])**2)**1.5)/np.absolute(2*fit[0])
 
     def fit_line(self, x, y):
         return np.polyfit(y, x, 2)

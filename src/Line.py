@@ -18,9 +18,7 @@ class Line:
         #radius of curvature of the line in some units
         self.radius_of_curvature = None 
         #distance in meters of vehicle center from the line
-        self.line_base_pos = None 
-        #difference in fit coefficients between last and new fits
-        self.diffs = np.array([0, 0, 0], dtype='float')
+        self.line_base_pos = None
         #x values for detected line pixels
         self.all_x = x_values
         #y values for detected line pixels

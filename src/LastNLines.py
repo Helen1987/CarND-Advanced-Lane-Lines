@@ -21,7 +21,7 @@ class LastNLines:
         self.roots_limit = None
 
     def init(self, width, height):
-        self.fitter = LineFitter(height, 30 / 720, 3.7 / 700)
+        self.fitter = LineFitter(height, 30 / 720, 3.7 / 900)
         self.MIN_LINES_DISTANCE = int(width / 1.7) # diff between lines can't be less
         self.roots_limit = [-height, height]
 
@@ -63,9 +63,11 @@ class LastNLines:
 
         line_fit, plot_x, plot_y = self.fitter.get_line_data(x_original, y_original)
         best_fit, best_x, best_y = self.get_best_line_fit(plot_x, plot_y, old_lines)
-        return Line(line_fit, plot_x, plot_y,
-                    best_fit, best_x, best_y,
-                    self.is_error_line, self.errors_in_a_raw > self.CRITICAL_ERRORS_COUNT)
+        line = Line(
+            line_fit, plot_x, plot_y, best_fit, best_x, best_y,
+            self.is_error_line, self.errors_in_a_raw > self.CRITICAL_ERRORS_COUNT)
+        line.radius_of_curvature = self.fitter.calculate_curvature(best_x, best_y)
+        return line
 
     def add_new_line(self, image):
         self.is_error_line = 0
