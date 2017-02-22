@@ -25,10 +25,6 @@ class LastNLines:
         self.MIN_LINES_DISTANCE = int(width / 1.7) # diff between lines can't be less
         self.roots_limit = [-height, height]
 
-    def filter_dots(self, x, y):
-        std_ind = (x - np.median(x)) < 2*np.std(x)
-        return x[std_ind], np.array(y)[std_ind]
-
     def passed_sanity_check(self, left, right):
         diff = np.median(right[0])-np.median(left[0])
         if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 250)):
@@ -61,7 +57,10 @@ class LastNLines:
         return self.fitter.get_line_data(all_x, all_y)
 
     def create_line(self, line_data, old_lines):
-        x_original, y_original = self.filter_dots(line_data[0], line_data[1])
+        line_fit = self.fitter.fit_line(line_data[0], line_data[1])
+        x_original, y_original = ConvolutionalSlider.get_filtered_line(
+            line_fit, line_data[0], np.array(line_data[1]), self.MAX_STD)
+
         line_fit, plot_x, plot_y = self.fitter.get_line_data(x_original, y_original)
         best_fit, best_x, best_y = self.get_best_line_fit(plot_x, plot_y, old_lines)
         return Line(line_fit, plot_x, plot_y,
@@ -72,7 +71,7 @@ class LastNLines:
         self.is_error_line = 0
         if len(self.left_lines) > 0:
             prev_left_line, prev_right_line = self.get_best_fit_lines()
-            left_line_data, right_line_data = self.slider.get_next_line(
+            left_line_data, right_line_data = self.slider.get_next_lines(
                 image, prev_left_line.best_fit, prev_right_line.best_fit)
             if not(self.passed_sanity_check(left_line_data, right_line_data)):
                 left_line_data, right_line_data = self.slider.get_initial_lines(image)

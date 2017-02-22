@@ -65,21 +65,23 @@ class ConvolutionalSlider:
         right_x = np.array(x_centroids)[:, 1]
         return (left_x, y_values), (right_x, y_values)
 
-    def get_next_line(self, bv_warped, left_fit, right_fit):
+    @staticmethod
+    def get_filtered_line(fit, x, y, margin):
+        line_inds = (
+            (x > (fit[0]*(y**2)+fit[1]*y+fit[2]-margin))
+            & (x < (fit[0]*(y**2)+fit[1]*y+fit[2]+margin)))
+        return x[line_inds], y[line_inds]
+
+    def get_next_lines(self, bv_warped, left_fit, right_fit):
         non_zero = bv_warped.nonzero()
         non_zero_y = np.array(non_zero[0])
         non_zero_x = np.array(non_zero[1])
-        # tricky part with x and y swaped
-        left_lane_inds = (
-            (non_zero_x > (left_fit[0]*(non_zero_y**2)+left_fit[1]*non_zero_y+left_fit[2]-self.window_margin))
-            & (non_zero_x < (left_fit[0]*(non_zero_y**2)+left_fit[1]*non_zero_y+left_fit[2]+self.window_margin)))
-        right_lane_inds = (
-            (non_zero_x > (right_fit[0]*(non_zero_y**2)+right_fit[1]*non_zero_y+right_fit[2]-self.window_margin))
-            & (non_zero_x < (right_fit[0]*(non_zero_y**2)+right_fit[1]*non_zero_y+right_fit[2]+self.window_margin)))
 
-        # Again, extract left and right line pixel positions
-        left_x = non_zero_x[left_lane_inds]
-        left_y = non_zero_y[left_lane_inds]
-        right_x = non_zero_x[right_lane_inds]
-        right_y = non_zero_y[right_lane_inds]
+        left_x, left_y = ConvolutionalSlider.get_filtered_line(
+            left_fit, non_zero_x, non_zero_y, self.window_margin)
+        right_x, right_y = ConvolutionalSlider.get_filtered_line(
+            right_fit, non_zero_x, non_zero_y, self.window_margin)
+
         return (left_x, left_y), (right_x, right_y)
+
+
