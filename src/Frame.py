@@ -3,13 +3,14 @@ import numpy as np
 
 BLUR_KERNEL = 3
 
+
 class Frame:
-    def __init__(self, img, mtx, dist):
-        self.img = cv2.undistort(img, mtx, dist, None, mtx)
+    def __init__(self, img):
+        self.img = cv2.undistort(img, Frame.mtx, Frame.dist, None, Frame.mtx)
         self.bird_view_img = None
 
     @staticmethod
-    def init(width, height):
+    def init(width, height, mtx, dist):
         top_offset = 100
         bottom_offset = 40
         top_line_offset = 80
@@ -28,6 +29,8 @@ class Frame:
 
         Frame.matrix = cv2.getPerspectiveTransform(s_points, d_points)
         Frame.inverse_matrix = cv2.getPerspectiveTransform(d_points, s_points)
+        Frame.mtx = mtx
+        Frame.dist = dist
 
     def _equalize(self, img):
         lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
@@ -58,13 +61,16 @@ class Frame:
             | ((scaled_sobel > sx_thresh[0]) & (scaled_sobel < sx_thresh[1]))] = 1
         return binary
 
+    def _preprocess_image(self):
+        equ = self._equalize(self.img)
+        blurred = cv2.GaussianBlur(equ, (BLUR_KERNEL, BLUR_KERNEL), 0)
+        return self._get_thresholded_image(blurred)
+
     def _bird_view_transformation(self, img):
         return cv2.warpPerspective(img, Frame.matrix, (img.shape[1], img.shape[0]))
 
-    def preprocess_frame(self):
-        equ = self._equalize(self.img)
-        blured = cv2.GaussianBlur(equ, (BLUR_KERNEL, BLUR_KERNEL), 0)
-        img = self._get_thresholded_image(blured)
+    def process_frame(self):
+        img = self._preprocess_image()
         self.bird_view_img = self._bird_view_transformation(img)
         return self.bird_view_img
 

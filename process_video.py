@@ -20,5 +20,5 @@ if __name__ == '__main__':
     mtx = dist_pickle["mtx"]
     dist = dist_pickle["dist"]
 
-    video = Video(args.source, args.output_folder, mtx, dist)
-    video.process()
+    video = Video(args.source, args.output_folder)
+    video.process(mtx, dist)

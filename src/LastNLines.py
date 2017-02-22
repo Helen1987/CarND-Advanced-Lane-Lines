@@ -49,7 +49,7 @@ class LastNLines:
         all_x = x[:]
         all_y = y[:]
         for line in old_lines:
-            data_to_take = current_coef*len(line.best_x)
+            data_to_take = int(current_coef*len(line.best_x))
             choice = np.random.choice(len(line.best_x), data_to_take)
 
             all_x = np.append(all_x, line.best_x[choice])

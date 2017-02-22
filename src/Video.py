@@ -9,18 +9,16 @@ from .LastNLines import LastNLines
 
 
 class Video:
-    def __init__(self, path, output_folder,  mtx, dist):
+    def __init__(self, path, output_folder,  ):
         # calibrate the camera
-        self.mtx = mtx
-        self.dist = dist
         self.path = path
         self.output_folder = os.path.join(os.getcwd(), output_folder)
         self.last_n_lines = LastNLines(5, 20)
 
     def handle_frame(self, image):
         try:
-            current_frame = Frame(image, self.mtx, self.dist)
-            bird_view_img = current_frame.preprocess_frame()
+            current_frame = Frame(image)
+            bird_view_img = current_frame.process_frame()
 
             self.last_n_lines.add_new_line(bird_view_img)
             left, right = self.last_n_lines.get_best_fit_lines()
@@ -31,9 +29,9 @@ class Video:
             raise
         return result
 
-    def process(self):
+    def process(self, mtx, dist):
         project_video = VideoFileClip(self.path)
-        Frame.init(project_video.size[0], project_video.size[1])
+        Frame.init(project_video.size[0], project_video.size[1], mtx, dist)
         self.last_n_lines.init(project_video.size[0], project_video.size[1])
 
         new_video = project_video.fl_image(self.handle_frame)
