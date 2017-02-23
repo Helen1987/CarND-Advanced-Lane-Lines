@@ -16,12 +16,14 @@ The goals / steps of this project are the following:
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
 My project include files and folders:
-* [test_images](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/tree/master/test_images) contains images on which my pipeline was tested to create satisfied results
-* [src](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/tree/master/src) contains source code of my pipeline
-* [camera_cal](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/tree/master/camera_cal) contains images for camera calibration
-* [research](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/tree/master/research) contains jupyter notebooks which I use to build my pipeline
-* [process_video.py](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/process_video.py) is used to start the video processing
-* [dist_pickle](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/blob/master/dist_pickle.p) is a pickle which contains camera calibration information (generated in notebook)
+* [test_images](/test_images) contains images on which my pipeline was tested to create satisfied results
+* [src](/src) contains source code of my pipeline
+* [camera_cal](/camera_cal) contains images for camera calibration
+* [research](/research) contains jupyter notebooks which I use to build my pipeline
+* [examples](/examples) contains images for writeup.md
+* [writeup.md](/writeup.md) short description of chosen approach
+* [process_video.py](/process_video.py) is used to start the video processing
+* [dist_pickle.p](/dist_pickle.p) is a pickle which contains camera calibration information (generated in notebook)
 
 To start video processing you have to run following command:
 
