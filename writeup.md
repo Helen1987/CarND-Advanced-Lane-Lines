@@ -21,6 +21,7 @@ The goals / steps of this project are the following:
 [roi]: ./examples/roi_test5.jpg "Region of interest"
 [wraped]: ./examples/warped_test5.jpg "Bird-view image"
 [line_tuning]: ./examples/line_tuning.jpg "Convolutional Window Tuning"
+[next_line]: ./examples/nextline.jpg "Search based on previous line"
 [final]: ./examples/result_test5.jpg "Resulted output"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -91,7 +92,9 @@ To identify lane-line pixels I use convolutional slider approach and search base
 
 Actually, I use convolution to find lines on ther first image or in case when the second approach did not gave sensible results. The logic of choosing the right appoach you can find in [`add_new_line` method](/src/LastNLines.py#L72) of [LastNLines class](/src/LastNLines.py). Convolutional approach you can find in [`get_initial_lines` method](/src/ConvolutionalSlider.py#L62)
 
-When I have the data from previous line I was able to use it to identify the next line in the same region with some margin. You can find the code in [`get_next_lines` method](/src/ConvolutionalSlider.py#L75)
+When I have the data from previous line I was able to use it to identify the next line in the same region with some margin. You can find the code in [`get_next_lines` method](/src/ConvolutionalSlider.py#L75). The idea is illustrated on the image below. You just search the next line in the area near the previously detected line.
+
+![alt text][next_line]
 
 To calculate information about identified line I use [`LineFitter` class](/src/LineFitter.py). Specifically, in [`fit_line` method](/src/LineFitter.py#L20) I fit a line into the second order polynomial and [`get_line_data` method](/src/LineFitter.py#L20) returned line fit and data which can be used to draw the resulted line.
 
