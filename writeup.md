@@ -46,7 +46,7 @@ Data usefull for image undistortion I saved into [dist_pickle.p](/dist_pickle.p)
 
 ###Pipeline (single images)
 
-To demonstrate the piplein, I will describe how I apply steps to one of the test images like this one:
+To demonstrate the pipeline, I will describe how I apply steps to one of the test images like this one:
 ![alt text][or_road]
 The code respponsible for image transforming you can find in my [Frame class](/src/Frame.py)
 
@@ -96,6 +96,7 @@ When I have the data from previous line I was able to use it to identify the nex
 To calculate information about identified line I use [`LineFitter` class](/src/LineFitter.py). Specifically, in [`fit_line` method](/src/LineFitter.py#L20) I fit a line into the second order polynomial and [`get_line_data` method](/src/LineFitter.py#L20) returned line fit and data which can be used to draw the resulted line.
 
 To fit line better I use different techniques:
+
 1. Removing outliers which deviates too much from [the line](/src/ConvolutionalSlider.py#L69)
 2. Weighted averaging of previous lines to remove [jittering](/src/LastNLines.py#L41)
 
@@ -111,7 +112,7 @@ Distance from the line center is calculated in `Frame` class inside [`draw_line_
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-You can find the code in [`draw_line_area` method](/src/Frame.py#L39).
+You can find the code in [`draw_line_area` method](/src/Frame.py#L77).
 
 First of all I draw the region between two line using best fit data. Then I apply `cv2.warpPerspective` on our bird-view image but with a matrix for inverse transformation. In result we get our final image.
 
@@ -123,7 +124,7 @@ First of all I draw the region between two line using best fit data. Then I appl
 
 ####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-the first video is good. On the second and the third it is possible to see that lines are not identified correctly, though pipeline is pretty robust.
+The first video is good. On the second and the third it is possible to see that lines are not identified correctly, though pipeline is pretty robust.
 
 * [track1](/output_video/result_project_video.mp4 "Video1")
 * [track2](/output_video/result_challenge_video.mp4 "Video2")
@@ -146,6 +147,6 @@ I started from the second part since it is easier to test the result when lines 
 
 My pipeline is not robust enough as we can see on the second and the third video. Though histogram normalization improved situation a lot, I still have a lot of issues with line detection. And I doubt I can predict lines at night. I have to improve the thresholding part to make it robust to different conditions.
 
-Though basic pipeline is pretty robust to identify odd images, it is possible to notice that on the third video when the right line is not visible, my pipeline goes crazy. I need to overcome such situations as well.
+Though basic pipeline is pretty robust to reject odd images, it is possible to notice that on the third video when the right line is not visible, my pipeline goes crazy. I need to overcome such situations as well.
 
-I want to remove some const to a config file or calculate them dinamically based on picture size.
+I want to move some const to a config file or calculate them dinamically based on picture.
