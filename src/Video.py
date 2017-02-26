@@ -36,7 +36,7 @@ class Video:
     def process(self, mtx, dist):
         project_video = VideoFileClip(self.path)
         Frame.init(project_video.size[0], project_video.size[1], mtx, dist)
-        self.last_n_lines.init(project_video.size[0], 3*project_video.size[1])
+        self.last_n_lines.init(Frame.bv_size[0], Frame.bv_size[1])
 
         new_video = project_video.fl_image(self.handle_frame)
         output_file_name = os.path.join(self.output_folder, "result_" + self.path)

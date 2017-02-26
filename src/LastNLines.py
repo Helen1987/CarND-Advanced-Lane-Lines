@@ -9,7 +9,7 @@ from .Line import Line
 class LastNLines:
     def __init__(self, lines_count, max_std):
         self.n = lines_count
-        self.MAX_STD = 50
+        self.MAX_STD = 60
         self.right_lines = deque([])
         self.left_lines = deque([])
         self.slider = ConvolutionalSlider(50, 80, 170, 50)
@@ -26,9 +26,11 @@ class LastNLines:
         self.roots_limit = [-height, height]
 
     def passed_sanity_check(self, left, right):
-        diff = np.median(right[0])-np.median(left[0])
-        if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 250)):
+        if (len(left[0]) < 1) or (len(right[0]) < 1):
             return False
+        #diff = np.median(right[0])-np.median(left[0])
+        #if not((diff > self.MIN_LINES_DISTANCE) and (diff < self.MIN_LINES_DISTANCE + 250)):
+        #    return False
         # check if line intersect
         left_fit = self.fitter.fit_line(left[0], left[1])
         right_fit = self.fitter.fit_line(right[0], right[1])
@@ -59,7 +61,10 @@ class LastNLines:
     def create_line(self, line_data, old_lines):
         line_fit = self.fitter.fit_line(line_data[0], line_data[1])
         x_original, y_original = ConvolutionalSlider.get_filtered_line(
-            line_fit, line_data[0], np.array(line_data[1]), self.MAX_STD)
+            line_fit, line_data[0], line_data[1], self.MAX_STD)
+
+        if len(x_original) < 1:
+            x_original, y_original = line_data[0], line_data[1]
 
         line_fit, plot_x, plot_y = self.fitter.get_line_data(x_original, y_original)
         best_fit, best_x, best_y = self.get_best_line_fit(plot_x, plot_y, old_lines)
@@ -98,14 +103,3 @@ class LastNLines:
 
     def get_best_fit_lines(self):
         return self.left_lines[-1], self.right_lines[-1]
-        '''
-        If your sanity checks reveal that the lane lines you've detected are problematic for some reason, you can simply assume it was a bad or difficult frame of video, retain the previous positions from the frame prior and step to the next frame to search again. If you lose the lines for several frames in a row, you should probably go back to the blind search method using a histogram and sliding window, or other method, to re-establish your measurement.
-        '''
-
-        '''
-        Even when everything is working, your line detections will jump around from frame to frame a bit and it can be preferable to smooth over the last n frames 
-        of video to obtain a cleaner result. Each time you get a new high-confidence measurement, you can append it to the list of recent measurements and then take
-        an average over n past measurements to obtain the lane position you want to draw onto the image.
-        '''
-        pass
-

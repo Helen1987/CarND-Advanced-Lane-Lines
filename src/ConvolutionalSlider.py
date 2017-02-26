@@ -39,8 +39,8 @@ class ConvolutionalSlider:
         x_center = np.argmax(conv) + x_min_index - offset
         new_center = x_center if np.max(conv) > self.conv_threshold else prev_x
 
-        angle = abs((level*self.window_height)/(new_center-x0)) if (new_center-x0) != 0 else 10
-        if (np.max(conv) <= self.conv_threshold) & (angle < 4) & ((x_min_index == 0) | (x_max_index == warped.shape[1])):
+        angle = abs((level*self.window_height)/(new_center-x0)) if (new_center-x0) != 0 else 11
+        if (np.max(conv) <= self.conv_threshold) & (angle < 10) & ((x_min_index == 0) | (x_max_index == warped.shape[1])):
             return None, None, None
 
         # Add what we found for that layer
@@ -58,6 +58,8 @@ class ConvolutionalSlider:
         left, right = self._find_initial_centroid(bv_image)
         x_left.append(left)
         y_left.append(first_y)
+        x_right.append(right)
+        y_right.append(first_y)
 
         # go through each layer looking for max pixel locations
         levels_count = int(image_height / self.window_height)
