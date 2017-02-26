@@ -1,7 +1,6 @@
-import numpy as np
 import os
 import sys
-import cv2
+import matplotlib.image as mpimg
 from moviepy.editor import VideoFileClip
 
 from .Frame import Frame
@@ -26,14 +25,23 @@ class Video:
             result = current_frame.draw_line_area(left, right)
         except:
             print("Unexpected error:", sys.exc_info()[0])
+            project_dir = os.getcwd()
+            output_folder_path = os.path.join(project_dir, 'output_images')
+            output_image_path = os.path.join(output_folder_path, 'error_.jpg')
+            mpimg.imsave(output_image_path, image)
             raise
+
         return result
 
     def process(self, mtx, dist):
         project_video = VideoFileClip(self.path)
         Frame.init(project_video.size[0], project_video.size[1], mtx, dist)
-        self.last_n_lines.init(project_video.size[0], project_video.size[1])
+        self.last_n_lines.init(project_video.size[0], 3*project_video.size[1])
 
         new_video = project_video.fl_image(self.handle_frame)
         output_file_name = os.path.join(self.output_folder, "result_" + self.path)
         new_video.write_videofile(output_file_name, audio=False)
+
+    def save_frame(self):
+        project_video = VideoFileClip(self.path)
+        project_video.save_frame('bug.jpg', (0, 16))

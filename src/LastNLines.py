@@ -9,10 +9,10 @@ from .Line import Line
 class LastNLines:
     def __init__(self, lines_count, max_std):
         self.n = lines_count
-        self.MAX_STD = max_std
+        self.MAX_STD = 50
         self.right_lines = deque([])
         self.left_lines = deque([])
-        self.slider = ConvolutionalSlider(50, 80, max_std*4)
+        self.slider = ConvolutionalSlider(50, 80, 170, 50)
         self.fitter = None
         self.MIN_LINES_DISTANCE = 0
         self.is_error_line = False
