@@ -124,12 +124,12 @@ class Frame:
     def _preprocess_image(self):
         equ = self._equalize(self.img)
 
-        r_binary = Frame.get_rgb_threshold_image(self.img)
+        #r_binary = Frame.get_rgb_threshold_image(self.img)
         hsl_binary = Frame.get_hsl_threshold_image(equ)
         hsv_binary = Frame.get_hsv_threshold_image(equ)
 
-        binary = np.zeros_like(r_binary)
-        binary[(r_binary == 1) | (hsl_binary == 1) | (hsv_binary == 1)] = 1
+        binary = np.zeros_like(hsl_binary)
+        binary[(hsl_binary == 1) | (hsv_binary == 1)] = 1
 
         return binary
 
