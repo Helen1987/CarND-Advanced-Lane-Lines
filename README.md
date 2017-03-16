@@ -42,6 +42,6 @@ As a result you will get a video with name *result_video_file.mp4* in *output_vi
 Project contains two branches:
 - [master](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/tree/master) contains code for the first project video
 - [advanced](https://github.com/Helen1987/CarND-Advanced-Lane-Lines/tree/advanced) contains code for challenge videos with results:
-  - [video1] (https://www.youtube.com/watch?v=1_3l8hsX0Ug)
-  - [video2] (https://www.youtube.com/watch?v=6l4mKvmSJVc)
-  - [video3] (https://www.youtube.com/watch?v=S2EK5ySOoKk)
+  - [video1](https://www.youtube.com/watch?v=1_3l8hsX0Ug)
+  - [video2](https://www.youtube.com/watch?v=6l4mKvmSJVc)
+  - [video3](https://www.youtube.com/watch?v=S2EK5ySOoKk)
